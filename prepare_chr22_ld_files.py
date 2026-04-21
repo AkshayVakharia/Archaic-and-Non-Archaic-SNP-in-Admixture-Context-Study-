@@ -38,8 +38,6 @@ for c in meta_df.columns:
     if lc == "population":
         pop_col = c
 
-if sample_col is None or pop_col is None:
-    raise ValueError(f"Could not find SampleID/Population columns in metadata. Found: {list(meta_df.columns)}")
 populations = ["CHB", "CEU", "MXL", "PEL", "CLM", "PUR"]
 for pop in populations:
     keep = meta_df.loc[meta_df[pop_col] == pop, sample_col].drop_duplicates().sort_values()
