@@ -44,12 +44,7 @@ def main():
             if c.upper() in {"UNPHASED_R2", "R2"}:
                 r2_col = c
                 break
-        if r2_col is None:
-            raise ValueError(f"Could not find R2 column in {infile}. Columns: {list(chunk.columns)}")
-
-        if "POS_A" not in chunk.columns or "POS_B" not in chunk.columns:
-            raise ValueError(f"Could not find POS_A / POS_B in {infile}. Columns: {list(chunk.columns)}")
-
+       
         dist = (chunk["POS_B"] - chunk["POS_A"]).abs().to_numpy()
         r2 = pd.to_numeric(chunk[r2_col], errors="coerce").to_numpy()
 
@@ -57,10 +52,6 @@ def main():
         dist = dist[valid]
         r2 = r2[valid]
         kept_rows += len(r2)
-
-        if len(r2) == 0:
-            print(f"[{args.snp_set} {args.population}] chunk {chunk_idx}: no usable rows")
-            continue
 
         bin_idx = np.searchsorted(bins, dist, side="right") - 1
         valid_bins = (bin_idx >= 0) & (bin_idx < n_bins)
@@ -72,11 +63,6 @@ def main():
             count_add = np.bincount(bin_idx, minlength=n_bins)
             sum_r2[:len(sum_add)] += sum_add
             count_r2[:len(count_add)] += count_add
-
-        print(
-            f"[{args.snp_set} {args.population}] chunk {chunk_idx}: "
-            f"read {len(chunk):,} rows, kept {len(r2):,} rows"
-        )
 
     bin_start = bins[:-1]
     bin_end = bins[1:]
